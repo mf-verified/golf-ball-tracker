@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Golf Ball Tracker</title>
+        <style>
+            :root {
+                --bg-color: #0d0d0d;
+                --glass-bg: rgba(255, 255, 255, 0.08);
+                --glass-border: rgba(255, 255, 255, 0.2);
+            }
+
+            body {
+                margin: 0;
+                padding: 0;
+                background-color: var(--bg-color);
+                color: white;
+                font-family: "Inter", system-ui, sans-serif;
+                height: 100vh;
+                width: 100vw;
+                overflow: hidden;
+                display: flex;
+            }
+
+            .stage {
+                display: flex;
+                width: 100%;
+                height: 100%;
+            }
+
+            .container-wrapper {
+                flex: 1;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-end;
+                align-items: center;
+                padding: 20px;
+                box-sizing: border-box;
+            }
+
+            .counter-label {
+                font-size: clamp(3rem, 10vw, 7rem);
+                font-weight: 900;
+                margin-bottom: 0;
+                line-height: 1;
+            }
+
+            .label-text {
+                font-size: 1.2rem;
+                color: #555;
+                margin-bottom: 20px;
+                text-transform: uppercase;
+                letter-spacing: 5px;
+            }
+
+            /* The Jar */
+            .jar {
+                position: relative;
+                width: 90%;
+                height: 65vh; /* Fixed height for calculations */
+                background: var(--glass-bg);
+                border: 4px solid var(--glass-border);
+                border-top: none;
+                border-radius: 0 0 50px 50px;
+                backdrop-filter: blur(10px);
+                padding: 10px;
+                box-sizing: border-box;
+                display: flex;
+                flex-wrap: wrap-reverse; /* Important for filling bottom-up */
+                align-content: flex-start;
+                justify-content: center;
+                overflow: hidden;
+                margin-bottom: 40px;
+            }
+
+            /* The Ball styling */
+            .ball {
+                border-radius: 50%;
+                margin: 1px;
+                box-shadow:
+                    inset -4px -4px 6px rgba(0, 0, 0, 0.4),
+                    1px 1px 3px rgba(0, 0, 0, 0.3);
+                flex-shrink: 0;
+            }
+
+            .red {
+                background: radial-gradient(
+                    circle at 35% 35%,
+                    #ff4d4d,
+                    #800000
+                );
+            }
+            .green {
+                background: radial-gradient(
+                    circle at 35% 35%,
+                    #4dff4d,
+                    #005000
+                );
+            }
+            .blue {
+                background: radial-gradient(
+                    circle at 35% 35%,
+                    #4db8ff,
+                    #002b80
+                );
+            }
+
+            /* Subtle divider between sides */
+            .divider {
+                width: 2px;
+                height: 80%;
+                background: linear-gradient(
+                    to bottom,
+                    transparent,
+                    rgba(255, 255, 255, 0.1),
+                    transparent
+                );
+                align-self: center;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container-wrapper">
+            <div id="count-red" class="counter-label">0</div>
+            <div class="label-text">Red</div>
+            <div id="jar-red" class="jar"></div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="container-wrapper">
+            <div id="count-mixed" class="counter-label">0</div>
+            <div class="label-text">Mixed</div>
+            <div id="jar-mixed" class="jar"></div>
+        </div>
+
+        <script>
+            const CSV_URL =
+                "https://docs.google.com/spreadsheets/d/e/2PACX-1vRTei2ZyJcEUL0LOH-_5IFqjdhN_CUUKHZJCgDGsestEjzuX-C9ifRu9VrT0ChJRPWSbbfQTVSCd2cw/pub?gid=0&single=true&output=csv";
+
+            async function updateDisplay() {
+                try {
+                    const response = await fetch(
+                        CSV_URL + "&t=" + new Date().getTime(),
+                    );
+                    const data = await response.text();
+                    const rows = data
+                        .split("\n")
+                        .map((r) => r.trim())
+                        .filter((r) => r.length > 0);
+                    if (rows.length < 2) return;
+
+                    const values = rows[1].split(",");
+                    const redCount = parseInt(values[0]) || 0;
+                    const greenCount = parseInt(values[1]) || 0;
+                    const blueCount = parseInt(values[2]) || 0;
+                    const mixedCount = greenCount + blueCount;
+
+                    // Update text
+                    document.getElementById("count-red").innerText =
+                        redCount.toLocaleString();
+                    document.getElementById("count-mixed").innerText =
+                        mixedCount.toLocaleString();
+
+                    // CALCULATION LOGIC:
+                    // Find the jar with the most balls. That jar must be "full".
+                    const maxBalls = Math.max(redCount, mixedCount);
+
+                    // Get physical dimensions of the jar
+                    const jarElement = document.getElementById("jar-red");
+                    const jarWidth = jarElement.clientWidth - 20; // minus padding
+                    const jarHeight = jarElement.clientHeight - 20;
+                    const jarArea = jarWidth * jarHeight;
+
+                    // Determine ball size.
+                    // We use a "packing factor" (0.8) because circles don't pack perfectly.
+                    let ballArea = (jarArea / maxBalls) * 0.82;
+                    let ballSize = Math.sqrt(ballArea);
+
+                    // Constraints: Don't let balls get too huge or too microscopic
+                    ballSize = Math.max(Math.min(ballSize, 60), 4);
+
+                    console.log(
+                        `Max: ${maxBalls}, Calculated Ball Size: ${ballSize}px`,
+                    );
+
+                    // Draw Red Jar
+                    renderJar("jar-red", redCount, ["red"], ballSize);
+
+                    // Draw Mixed Jar
+                    const mixedColors = [];
+                    for (let i = 0; i < greenCount; i++)
+                        mixedColors.push("green");
+                    for (let i = 0; i < blueCount; i++)
+                        mixedColors.push("blue");
+                    mixedColors.sort(() => Math.random() - 0.5);
+                    renderJar("jar-mixed", mixedCount, mixedColors, ballSize);
+                } catch (e) {
+                    console.error("Fetch error:", e);
+                }
+            }
+
+            function renderJar(jarId, count, colorArray, size) {
+                const jar = document.getElementById(jarId);
+                jar.innerHTML = "";
+
+                const fragment = document.createDocumentFragment();
+                for (let i = 0; i < count; i++) {
+                    const ball = document.createElement("div");
+                    const color =
+                        colorArray.length > 1 ? colorArray[i] : colorArray[0];
+                    ball.className = "ball " + color;
+
+                    // Set the dynamic size
+                    ball.style.width = size + "px";
+                    ball.style.height = size + "px";
+
+                    fragment.appendChild(ball);
+                }
+                jar.appendChild(fragment);
+            }
+
+            // Handle window resizing to recalculate ball sizes
+            window.addEventListener("resize", updateDisplay);
+
+            // Initial load and interval
+            updateDisplay();
+            setInterval(updateDisplay, 30000);
+        </script>
+    </body>
+</html>
