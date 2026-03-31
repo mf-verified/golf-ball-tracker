@@ -5,17 +5,20 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Golf Ball Tracker</title>
         <style>
+            /* --- BASE SYSTEM & STANDARD THEME (Accessible) --- */
             :root {
                 --bg-color: #0d0d0d;
                 --glass-bg: rgba(255, 255, 255, 0.08);
                 --glass-border: rgba(255, 255, 255, 0.2);
+                --text-main: #ffffff;
+                --text-sub: #666;
             }
 
             body {
                 margin: 0;
                 padding: 0;
                 background-color: var(--bg-color);
-                color: white;
+                color: var(--text-main);
                 font-family: "Inter", system-ui, sans-serif;
                 height: 100vh;
                 width: 100vw;
@@ -27,8 +30,8 @@
                 display: flex;
                 width: 100%;
                 height: 100%;
+                z-index: 2;
             }
-
             .container-wrapper {
                 flex: 1;
                 height: 100%;
@@ -46,20 +49,18 @@
                 margin-bottom: 0;
                 line-height: 1;
             }
-
             .label-text {
                 font-size: 1.2rem;
-                color: #555;
+                color: var(--text-sub);
                 margin-bottom: 20px;
                 text-transform: uppercase;
                 letter-spacing: 5px;
             }
 
-            /* The Jar */
             .jar {
                 position: relative;
                 width: 90%;
-                height: 65vh; /* Fixed height for calculations */
+                height: 65vh;
                 background: var(--glass-bg);
                 border: 4px solid var(--glass-border);
                 border-top: none;
@@ -68,23 +69,23 @@
                 padding: 10px;
                 box-sizing: border-box;
                 display: flex;
-                flex-wrap: wrap-reverse; /* Important for filling bottom-up */
+                flex-wrap: wrap-reverse;
                 align-content: flex-start;
                 justify-content: center;
                 overflow: hidden;
                 margin-bottom: 40px;
             }
 
-            /* The Ball styling */
+            /* ACCESSIBLE GOLF BALLS (Standard Theme) */
             .ball {
                 border-radius: 50%;
                 margin: 1px;
-                box-shadow:
-                    inset -4px -4px 6px rgba(0, 0, 0, 0.4),
-                    1px 1px 3px rgba(0, 0, 0, 0.3);
                 flex-shrink: 0;
+                box-shadow: inset -3px -3px 5px rgba(0, 0, 0, 0.5);
+                border: 1px solid rgba(255, 255, 255, 0.1); /* Edge definition */
             }
 
+            /* RED: Standard high-gloss */
             .red {
                 background: radial-gradient(
                     circle at 35% 35%,
@@ -92,48 +93,116 @@
                     #800000
                 );
             }
+
+            /* GREEN: High-Contrast Lime with "Dimple" Texture (Dots) */
             .green {
-                background: radial-gradient(
-                    circle at 35% 35%,
-                    #4dff4d,
-                    #005000
-                );
-            }
-            .blue {
-                background: radial-gradient(
-                    circle at 35% 35%,
-                    #4db8ff,
-                    #002b80
-                );
+                background:
+                    radial-gradient(
+                        circle,
+                        rgba(255, 255, 255, 0.15) 1px,
+                        transparent 1px
+                    ),
+                    radial-gradient(circle at 35% 35%, #b2ff59, #33691e);
+                background-size:
+                    6px 6px,
+                    100% 100%;
             }
 
-            /* Subtle divider between sides */
-            .divider {
-                width: 2px;
-                height: 80%;
-                background: linear-gradient(
-                    to bottom,
-                    transparent,
-                    rgba(255, 255, 255, 0.1),
-                    transparent
+            /* BLUE: Deep Sky Blue with "Dual Shine" Pattern (Diagonal Stripe) */
+            .blue {
+                background:
+                    linear-gradient(
+                        135deg,
+                        transparent 40%,
+                        rgba(255, 255, 255, 0.3) 50%,
+                        transparent 60%
+                    ),
+                    radial-gradient(circle at 35% 35%, #40c4ff, #01579b);
+            }
+
+            /* --- EASTER THEME V2 (Accessible) --- */
+            body.easter-theme {
+                background-color: #fdfae6;
+                color: #4e342e;
+            }
+            .easter-theme .label-text {
+                color: #8d6e63;
+            }
+            .easter-theme .jar {
+                background: rgba(255, 255, 255, 0.4);
+                border-color: rgba(141, 110, 99, 0.3);
+            }
+            .easter-theme .ball {
+                border-radius: 50% 50% 50% 50% / 65% 65% 35% 35%;
+                transform: rotate(calc(var(--r, 0) * 1deg));
+                height: 1.3em; /* Eggs are taller */
+            }
+            .easter-theme .red {
+                background: radial-gradient(
+                    circle at 35% 35%,
+                    #ff8a80,
+                    #d32f2f
                 );
-                align-self: center;
+            }
+            .easter-theme .green {
+                background:
+                    radial-gradient(
+                        circle,
+                        rgba(0, 0, 0, 0.05) 1px,
+                        transparent 3px
+                    ),
+                    radial-gradient(circle at 35% 35%, #dce775, #558b2f);
+                background-size:
+                    8px 8px,
+                    100% 100%;
+            }
+            .easter-theme .blue {
+                background:
+                    linear-gradient(
+                        0deg,
+                        transparent 48%,
+                        rgba(255, 255, 255, 0.3) 50%,
+                        transparent 52%
+                    ),
+                    radial-gradient(circle at 35% 35%, #81d4fa, #0277bd);
+                background-size:
+                    100% 10px,
+                    100% 100%;
+            }
+            .easter-header {
+                display: none;
+            }
+            body.easter-theme .easter-header {
+                display: block;
+                position: absolute;
+                top: 20px;
+                width: 100%;
+                text-align: center;
+                font-size: 2.5rem;
+                font-weight: bold;
+                color: #5d4037;
+                z-index: 10;
+                font-family: cursive;
             }
         </style>
     </head>
-    <body>
-        <div class="container-wrapper">
-            <div id="count-red" class="counter-label">0</div>
-            <div class="label-text">Red</div>
-            <div id="jar-red" class="jar"></div>
-        </div>
 
-        <div class="divider"></div>
+    <!-- CHANGE THIS TO <body class=""> TO REMOVE THE EASTER THEME -->
+    <body class="">
+        <div class="easter-header">Glad Påsk! 🐣</div>
 
-        <div class="container-wrapper">
-            <div id="count-mixed" class="counter-label">0</div>
-            <div class="label-text">Mixed</div>
-            <div id="jar-mixed" class="jar"></div>
+        <div class="stage">
+            <div class="container-wrapper">
+                <div id="count-red" class="counter-label">0</div>
+                <div class="label-text">Red Count</div>
+                <div id="jar-red" class="jar"></div>
+            </div>
+
+            <div class="container-wrapper">
+                <div id="count-mixed" class="counter-label">0</div>
+                <div class="label-text">Mixed Count</div>
+                <div id="jar-mixed" class="jar"></div>
+            </div>
         </div>
 
         <script>
@@ -158,38 +227,23 @@
                     const blueCount = parseInt(values[2]) || 0;
                     const mixedCount = greenCount + blueCount;
 
-                    // Update text
                     document.getElementById("count-red").innerText =
                         redCount.toLocaleString();
                     document.getElementById("count-mixed").innerText =
                         mixedCount.toLocaleString();
 
-                    // CALCULATION LOGIC:
-                    // Find the jar with the most balls. That jar must be "full".
-                    const maxBalls = Math.max(redCount, mixedCount);
-
-                    // Get physical dimensions of the jar
+                    const maxCount = Math.max(redCount, mixedCount);
                     const jarElement = document.getElementById("jar-red");
-                    const jarWidth = jarElement.clientWidth - 20; // minus padding
-                    const jarHeight = jarElement.clientHeight - 20;
-                    const jarArea = jarWidth * jarHeight;
+                    const jarArea =
+                        (jarElement.clientWidth - 20) *
+                        (jarElement.clientHeight - 20);
 
-                    // Determine ball size.
-                    // We use a "packing factor" (0.8) because circles don't pack perfectly.
-                    let ballArea = (jarArea / maxBalls) * 0.82;
+                    let ballArea = (jarArea / maxCount) * 0.78;
                     let ballSize = Math.sqrt(ballArea);
+                    ballSize = Math.max(Math.min(ballSize, 70), 6);
 
-                    // Constraints: Don't let balls get too huge or too microscopic
-                    ballSize = Math.max(Math.min(ballSize, 60), 4);
-
-                    console.log(
-                        `Max: ${maxBalls}, Calculated Ball Size: ${ballSize}px`,
-                    );
-
-                    // Draw Red Jar
                     renderJar("jar-red", redCount, ["red"], ballSize);
 
-                    // Draw Mixed Jar
                     const mixedColors = [];
                     for (let i = 0; i < greenCount; i++)
                         mixedColors.push("green");
@@ -205,27 +259,32 @@
             function renderJar(jarId, count, colorArray, size) {
                 const jar = document.getElementById(jarId);
                 jar.innerHTML = "";
-
                 const fragment = document.createDocumentFragment();
+                const isEaster =
+                    document.body.classList.contains("easter-theme");
+
                 for (let i = 0; i < count; i++) {
                     const ball = document.createElement("div");
                     const color =
                         colorArray.length > 1 ? colorArray[i] : colorArray[0];
                     ball.className = "ball " + color;
 
-                    // Set the dynamic size
                     ball.style.width = size + "px";
-                    ball.style.height = size + "px";
+                    ball.style.height = isEaster
+                        ? size * 1.35 + "px"
+                        : size + "px";
+
+                    if (isEaster) {
+                        const rotation = Math.floor(Math.random() * 60) - 30;
+                        ball.style.setProperty("--r", rotation);
+                    }
 
                     fragment.appendChild(ball);
                 }
                 jar.appendChild(fragment);
             }
 
-            // Handle window resizing to recalculate ball sizes
             window.addEventListener("resize", updateDisplay);
-
-            // Initial load and interval
             updateDisplay();
             setInterval(updateDisplay, 30000);
         </script>
