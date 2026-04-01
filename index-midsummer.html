@@ -3,9 +3,9 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Golf Ball Tracker ⛳️</title>
+        <title>Midsommar Tracker ☀️</title>
         <style>
-            /* --- BASE SYSTEM & STANDARD THEME (Accessible) --- */
+            /* --- BASE SYSTEM --- */
             :root {
                 --bg-color: #0d0d0d;
                 --glass-bg: rgba(255, 255, 255, 0.08);
@@ -13,7 +13,6 @@
                 --text-main: #ffffff;
                 --text-sub: #666;
             }
-
             body {
                 margin: 0;
                 padding: 0;
@@ -25,12 +24,12 @@
                 overflow: hidden;
                 display: flex;
             }
-
             .stage {
                 display: flex;
                 width: 100%;
                 height: 100%;
                 z-index: 2;
+                position: relative;
             }
             .container-wrapper {
                 flex: 1;
@@ -42,12 +41,12 @@
                 padding: 20px;
                 box-sizing: border-box;
             }
-
             .counter-label {
                 font-size: clamp(3rem, 10vw, 7rem);
                 font-weight: 900;
                 margin-bottom: 0;
                 line-height: 1;
+                z-index: 5;
             }
             .label-text {
                 font-size: 1.2rem;
@@ -55,12 +54,12 @@
                 margin-bottom: 20px;
                 text-transform: uppercase;
                 letter-spacing: 5px;
+                z-index: 5;
             }
-
             .jar {
                 position: relative;
                 width: 90%;
-                height: 65vh;
+                height: 60vh;
                 background: var(--glass-bg);
                 border: 4px solid var(--glass-border);
                 border-top: none;
@@ -75,17 +74,25 @@
                 overflow: hidden;
                 margin-bottom: 40px;
             }
-
-            /* ACCESSIBLE GOLF BALLS (Standard Theme) */
             .ball {
                 border-radius: 50%;
                 margin: 1px;
                 flex-shrink: 0;
-                box-shadow: inset -3px -3px 5px rgba(0, 0, 0, 0.5);
-                border: 1px solid rgba(255, 255, 255, 0.1); /* Edge definition */
+                box-shadow: inset -3px -3px 5px rgba(0, 0, 0, 0.4);
+                border: 1px solid rgba(0, 0, 0, 0.1);
+            }
+            .header-title {
+                display: none;
+                position: absolute;
+                top: 20px;
+                width: 100%;
+                text-align: center;
+                font-size: 2.5rem;
+                font-weight: bold;
+                z-index: 10;
             }
 
-            /* RED: Standard high-gloss */
+            /* --- STANDARD ACCESSIBLE COLORS --- */
             .red {
                 background: radial-gradient(
                     circle at 35% 35%,
@@ -93,13 +100,11 @@
                     #800000
                 );
             }
-
-            /* GREEN: High-Contrast Lime with "Dimple" Texture (Dots) */
             .green {
                 background:
                     radial-gradient(
                         circle,
-                        rgba(255, 255, 255, 0.15) 1px,
+                        rgba(255, 255, 255, 0.2) 1px,
                         transparent 1px
                     ),
                     radial-gradient(circle at 35% 35%, #b2ff59, #33691e);
@@ -107,8 +112,6 @@
                     6px 6px,
                     100% 100%;
             }
-
-            /* BLUE: Deep Sky Blue with "Dual Shine" Pattern (Diagonal Stripe) */
             .blue {
                 background:
                     linear-gradient(
@@ -120,87 +123,126 @@
                     radial-gradient(circle at 35% 35%, #40c4ff, #01579b);
             }
 
-            /* --- EASTER THEME V2 (Accessible) --- */
-            body.easter-theme {
-                background-color: #fdfae6;
-                color: #4e342e;
+            /* --- MIDSOMMAR THEME (WCAG Optimized) --- */
+            body.midsummer-theme {
+                background: linear-gradient(
+                    to bottom,
+                    #87ceeb 0%,
+                    #e0f7fa 100%
+                ); /* Bright Sky */
+                color: #004d40;
             }
-            .easter-theme .label-text {
-                color: #8d6e63;
+            .midsummer-theme .header-title {
+                display: block;
+                color: #bf360c;
+                text-shadow: 2px 2px 0px white;
+                font-family: "Georgia", serif;
             }
-            .easter-theme .jar {
-                background: rgba(255, 255, 255, 0.4);
-                border-color: rgba(141, 110, 99, 0.3);
+            .midsummer-theme .label-text {
+                color: #00796b;
+                font-weight: bold;
             }
-            .easter-theme .ball {
-                border-radius: 50% 50% 50% 50% / 65% 65% 35% 35%;
-                transform: rotate(calc(var(--r, 0) * 1deg));
-                height: 1.3em; /* Eggs are taller */
+            .midsummer-theme .jar {
+                background: rgba(255, 255, 255, 0.5);
+                border-color: #fff;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
             }
-            .easter-theme .red {
-                background: radial-gradient(
-                    circle at 35% 35%,
-                    #ff8a80,
-                    #d32f2f
-                );
-            }
-            .easter-theme .green {
+
+            /* Red -> Strawberry (Slightly tapered with seeds) */
+            .midsummer-theme .red {
+                border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
                 background:
                     radial-gradient(
-                        circle,
-                        rgba(0, 0, 0, 0.05) 1px,
-                        transparent 3px
+                        circle at 50% 50%,
+                        #fff 1px,
+                        transparent 2px
                     ),
-                    radial-gradient(circle at 35% 35%, #dce775, #558b2f);
+                    radial-gradient(circle at 35% 35%, #ff5252, #b71c1c);
                 background-size:
-                    8px 8px,
+                    8px 10px,
                     100% 100%;
             }
-            .easter-theme .blue {
+
+            /* Green -> Birch Leaf (Pointed with veins) */
+            .midsummer-theme .green {
+                border-radius: 2% 80% 2% 80%;
                 background:
                     linear-gradient(
-                        0deg,
+                        45deg,
                         transparent 48%,
-                        rgba(255, 255, 255, 0.3) 50%,
+                        rgba(0, 0, 0, 0.1) 50%,
                         transparent 52%
                     ),
-                    radial-gradient(circle at 35% 35%, #81d4fa, #0277bd);
-                background-size:
-                    100% 10px,
-                    100% 100%;
+                    radial-gradient(circle at 35% 35%, #aed581, #33691e);
             }
-            .easter-header {
+
+            /* Blue -> Cornflower (Bluebell) (Radial Petal Pattern) */
+            .midsummer-theme .blue {
+                background:
+                    repeating-conic-gradient(
+                        from 0deg,
+                        transparent 0deg 30deg,
+                        rgba(255, 255, 255, 0.1) 31deg 35deg
+                    ),
+                    radial-gradient(circle at 35% 35%, #4fc3f7, #0d47a1);
+            }
+
+            /* The Midsummer Pole (Midsommarstång) */
+            .midsummer-pole {
                 display: none;
-            }
-            body.easter-theme .easter-header {
-                display: block;
                 position: absolute;
-                top: 20px;
-                width: 100%;
-                text-align: center;
-                font-size: 2.5rem;
-                font-weight: bold;
-                color: #5d4037;
-                z-index: 10;
-                font-family: cursive;
+                left: 50%;
+                bottom: 0;
+                transform: translateX(-50%);
+                width: 15px;
+                height: 80vh;
+                background: #5d4037;
+                z-index: 1;
             }
+            .midsummer-pole::before {
+                /* Crossbar */
+                content: "";
+                position: absolute;
+                top: 100px;
+                left: -60px;
+                width: 135px;
+                height: 12px;
+                background: #5d4037;
+            }
+            .midsummer-pole::after {
+                /* The Hoops */
+                content: "◯ ◯";
+                color: #2e7d32;
+                font-size: 60px;
+                font-weight: bold;
+                position: absolute;
+                top: 105px;
+                left: -65px;
+                width: 150px;
+                text-align: center;
+            }
+            body.midsummer-theme .midsummer-pole {
+                display: block;
+            }
+
+            /* --- THEME TOGGLE CLASSES --- */
+            /* Change <body class="midsummer-theme"> below to switch */
         </style>
     </head>
-
-    <!-- CHANGE THIS TO <body class=""> TO REMOVE THE EASTER THEME -->
-    <body class="">
-        <div class="easter-header">Glad Påsk! 🐣</div>
+    <body class="midsummer-theme">
+        <div class="header-title">Glad Midsommar! ☀️</div>
+        <div class="midsummer-pole"></div>
 
         <div class="stage">
             <div class="container-wrapper">
                 <div id="count-red" class="counter-label">0</div>
-                <div class="label-text">Red Count</div>
+                <div class="label-text">Jordgubbar</div>
                 <div id="jar-red" class="jar"></div>
             </div>
 
             <div class="container-wrapper">
                 <div id="count-mixed" class="counter-label">0</div>
-                <div class="label-text">Mixed Count</div>
+                <div class="label-text">Sommarblomster</div>
                 <div id="jar-mixed" class="jar"></div>
             </div>
         </div>
@@ -233,14 +275,14 @@
                         mixedCount.toLocaleString();
 
                     const maxCount = Math.max(redCount, mixedCount);
-                    const jarElement = document.getElementById("jar-red");
+                    const jarElement = document.querySelector(".jar");
                     const jarArea =
                         (jarElement.clientWidth - 20) *
                         (jarElement.clientHeight - 20);
 
                     let ballArea = (jarArea / maxCount) * 0.78;
                     let ballSize = Math.sqrt(ballArea);
-                    ballSize = Math.max(Math.min(ballSize, 70), 6);
+                    ballSize = Math.max(Math.min(ballSize, 60), 8);
 
                     renderJar("jar-red", redCount, ["red"], ballSize);
 
@@ -260,8 +302,8 @@
                 const jar = document.getElementById(jarId);
                 jar.innerHTML = "";
                 const fragment = document.createDocumentFragment();
-                const isEaster =
-                    document.body.classList.contains("easter-theme");
+                const isMidsummer =
+                    document.body.classList.contains("midsummer-theme");
 
                 for (let i = 0; i < count; i++) {
                     const ball = document.createElement("div");
@@ -270,14 +312,11 @@
                     ball.className = "ball " + color;
 
                     ball.style.width = size + "px";
-                    ball.style.height = isEaster
-                        ? size * 1.35 + "px"
-                        : size + "px";
+                    ball.style.height = size + "px";
 
-                    if (isEaster) {
-                        const rotation = Math.floor(Math.random() * 60) - 30;
-                        ball.style.setProperty("--r", rotation);
-                    }
+                    // Random rotation for leaves and strawberries
+                    const rotation = Math.floor(Math.random() * 360);
+                    ball.style.transform = `rotate(${rotation}deg)`;
 
                     fragment.appendChild(ball);
                 }
