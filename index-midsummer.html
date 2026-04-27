@@ -3,329 +3,243 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Midsommar Tracker ☀️</title>
+        <title>High-Performance Tracker</title>
         <style>
-            /* --- BASE SYSTEM --- */
             :root {
-                --bg-color: #0d0d0d;
-                --glass-bg: rgba(255, 255, 255, 0.08);
-                --glass-border: rgba(255, 255, 255, 0.2);
-                --text-main: #ffffff;
-                --text-sub: #666;
+                --bg: #0d0d0d;
+                --jar-glass: rgba(255, 255, 255, 0.1);
+                --text: #fff;
             }
+            /* Theme Toggles */
+            body.midsummer-theme {
+                --bg: #87ceeb;
+                --jar-glass: rgba(255, 255, 255, 0.5);
+                --text: #004d40;
+            }
+            body.easter-theme {
+                --bg: #fdfae6;
+                --jar-glass: rgba(255, 255, 255, 0.4);
+                --text: #4e342e;
+            }
+
             body {
                 margin: 0;
-                padding: 0;
-                background-color: var(--bg-color);
-                color: var(--text-main);
-                font-family: "Inter", system-ui, sans-serif;
-                height: 100vh;
-                width: 100vw;
+                background: var(--bg);
+                color: var(--text);
+                font-family: sans-serif;
                 overflow: hidden;
-                display: flex;
+                transition: background 0.5s ease;
             }
             .stage {
                 display: flex;
-                width: 100%;
-                height: 100%;
-                z-index: 2;
-                position: relative;
+                width: 100vw;
+                height: 100vh;
             }
-            .container-wrapper {
+            .wrapper {
                 flex: 1;
-                height: 100%;
                 display: flex;
                 flex-direction: column;
-                justify-content: flex-end;
                 align-items: center;
+                justify-content: flex-end;
                 padding: 20px;
-                box-sizing: border-box;
             }
-            .counter-label {
-                font-size: clamp(3rem, 10vw, 7rem);
+            .counter {
+                font-size: 8vw;
                 font-weight: 900;
-                margin-bottom: 0;
-                line-height: 1;
-                z-index: 5;
+                margin: 0;
             }
-            .label-text {
-                font-size: 1.2rem;
-                color: var(--text-sub);
-                margin-bottom: 20px;
+            .label {
                 text-transform: uppercase;
                 letter-spacing: 5px;
-                z-index: 5;
+                opacity: 0.7;
+                margin-bottom: 10px;
             }
-            .jar {
-                position: relative;
-                width: 90%;
-                height: 60vh;
-                background: var(--glass-bg);
-                border: 4px solid var(--glass-border);
+
+            canvas {
+                background: var(--jar-glass);
+                border: 4px solid rgba(255, 255, 255, 0.2);
                 border-top: none;
                 border-radius: 0 0 50px 50px;
-                backdrop-filter: blur(10px);
-                padding: 10px;
-                box-sizing: border-box;
-                display: flex;
-                flex-wrap: wrap-reverse;
-                align-content: flex-start;
-                justify-content: center;
-                overflow: hidden;
-                margin-bottom: 40px;
+                max-width: 90%;
+                height: 60vh; /* Scaled via JS */
             }
-            .ball {
-                border-radius: 50%;
-                margin: 1px;
-                flex-shrink: 0;
-                box-shadow: inset -3px -3px 5px rgba(0, 0, 0, 0.4);
-                border: 1px solid rgba(0, 0, 0, 0.1);
-            }
-            .header-title {
-                display: none;
-                position: absolute;
-                top: 20px;
-                width: 100%;
-                text-align: center;
-                font-size: 2.5rem;
-                font-weight: bold;
-                z-index: 10;
-            }
-
-            /* --- STANDARD ACCESSIBLE COLORS --- */
-            .red {
-                background: radial-gradient(
-                    circle at 35% 35%,
-                    #ff4d4d,
-                    #800000
-                );
-            }
-            .green {
-                background:
-                    radial-gradient(
-                        circle,
-                        rgba(255, 255, 255, 0.2) 1px,
-                        transparent 1px
-                    ),
-                    radial-gradient(circle at 35% 35%, #b2ff59, #33691e);
-                background-size:
-                    6px 6px,
-                    100% 100%;
-            }
-            .blue {
-                background:
-                    linear-gradient(
-                        135deg,
-                        transparent 40%,
-                        rgba(255, 255, 255, 0.3) 50%,
-                        transparent 60%
-                    ),
-                    radial-gradient(circle at 35% 35%, #40c4ff, #01579b);
-            }
-
-            /* --- MIDSOMMAR THEME (WCAG Optimized) --- */
-            body.midsummer-theme {
-                background: linear-gradient(
-                    to bottom,
-                    #87ceeb 0%,
-                    #e0f7fa 100%
-                ); /* Bright Sky */
-                color: #004d40;
-            }
-            .midsummer-theme .header-title {
-                display: block;
-                color: #bf360c;
-                text-shadow: 2px 2px 0px white;
-                font-family: "Georgia", serif;
-            }
-            .midsummer-theme .label-text {
-                color: #00796b;
-                font-weight: bold;
-            }
-            .midsummer-theme .jar {
-                background: rgba(255, 255, 255, 0.5);
-                border-color: #fff;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            }
-
-            /* Red -> Strawberry (Slightly tapered with seeds) */
-            .midsummer-theme .red {
-                border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
-                background:
-                    radial-gradient(
-                        circle at 50% 50%,
-                        #fff 1px,
-                        transparent 2px
-                    ),
-                    radial-gradient(circle at 35% 35%, #ff5252, #b71c1c);
-                background-size:
-                    8px 10px,
-                    100% 100%;
-            }
-
-            /* Green -> Birch Leaf (Pointed with veins) */
-            .midsummer-theme .green {
-                border-radius: 2% 80% 2% 80%;
-                background:
-                    linear-gradient(
-                        45deg,
-                        transparent 48%,
-                        rgba(0, 0, 0, 0.1) 50%,
-                        transparent 52%
-                    ),
-                    radial-gradient(circle at 35% 35%, #aed581, #33691e);
-            }
-
-            /* Blue -> Cornflower (Bluebell) (Radial Petal Pattern) */
-            .midsummer-theme .blue {
-                background:
-                    repeating-conic-gradient(
-                        from 0deg,
-                        transparent 0deg 30deg,
-                        rgba(255, 255, 255, 0.1) 31deg 35deg
-                    ),
-                    radial-gradient(circle at 35% 35%, #4fc3f7, #0d47a1);
-            }
-
-            /* The Midsummer Pole (Midsommarstång) */
-            .midsummer-pole {
-                display: none;
-                position: absolute;
-                left: 50%;
-                bottom: 0;
-                transform: translateX(-50%);
-                width: 15px;
-                height: 80vh;
-                background: #5d4037;
-                z-index: 1;
-            }
-            .midsummer-pole::before {
-                /* Crossbar */
-                content: "";
-                position: absolute;
-                top: 100px;
-                left: -60px;
-                width: 135px;
-                height: 12px;
-                background: #5d4037;
-            }
-            .midsummer-pole::after {
-                /* The Hoops */
-                content: "◯ ◯";
-                color: #2e7d32;
-                font-size: 60px;
-                font-weight: bold;
-                position: absolute;
-                top: 105px;
-                left: -65px;
-                width: 150px;
-                text-align: center;
-            }
-            body.midsummer-theme .midsummer-pole {
-                display: block;
-            }
-
-            /* --- THEME TOGGLE CLASSES --- */
-            /* Change <body class="midsummer-theme"> below to switch */
         </style>
     </head>
     <body class="midsummer-theme">
-        <div class="header-title">Glad Midsommar! ☀️</div>
-        <div class="midsummer-pole"></div>
+        <!-- Toggle class here -->
 
         <div class="stage">
-            <div class="container-wrapper">
-                <div id="count-red" class="counter-label">0</div>
-                <div class="label-text">Jordgubbar</div>
-                <div id="jar-red" class="jar"></div>
+            <div class="wrapper">
+                <p id="count-red" class="counter">0</p>
+                <p class="label">Primary</p>
+                <canvas id="canvas-red"></canvas>
             </div>
-
-            <div class="container-wrapper">
-                <div id="count-mixed" class="counter-label">0</div>
-                <div class="label-text">Sommarblomster</div>
-                <div id="jar-mixed" class="jar"></div>
+            <div class="wrapper">
+                <p id="count-mix" class="counter">0</p>
+                <p class="label">Mixed</p>
+                <canvas id="canvas-mix"></canvas>
             </div>
         </div>
 
         <script>
             const CSV_URL =
                 "https://docs.google.com/spreadsheets/d/e/2PACX-1vRTei2ZyJcEUL0LOH-_5IFqjdhN_CUUKHZJCgDGsestEjzuX-C9ifRu9VrT0ChJRPWSbbfQTVSCd2cw/pub?gid=0&single=true&output=csv";
+            let lastData = ""; // Store last fetch to prevent unnecessary redrawing
 
-            async function updateDisplay() {
+            // Theme Definitions
+            const themes = {
+                standard: {
+                    red: "#ff4d4d",
+                    green: "#b2ff59",
+                    blue: "#40c4ff",
+                    shape: "circle",
+                },
+                easter: {
+                    red: "#ff8a80",
+                    green: "#dce775",
+                    blue: "#81d4fa",
+                    shape: "egg",
+                },
+                midsummer: {
+                    red: "#ff5252",
+                    green: "#aed581",
+                    blue: "#4fc3f7",
+                    shape: "leaf",
+                },
+            };
+
+            async function update() {
                 try {
-                    const response = await fetch(
-                        CSV_URL + "&t=" + new Date().getTime(),
-                    );
-                    const data = await response.text();
-                    const rows = data
-                        .split("\n")
-                        .map((r) => r.trim())
-                        .filter((r) => r.length > 0);
-                    if (rows.length < 2) return;
+                    const res = await fetch(CSV_URL + "?t=" + Date.now());
+                    const text = await res.text();
 
-                    const values = rows[1].split(",");
-                    const redCount = parseInt(values[0]) || 0;
-                    const greenCount = parseInt(values[1]) || 0;
-                    const blueCount = parseInt(values[2]) || 0;
-                    const mixedCount = greenCount + blueCount;
+                    // OPTIMIZATION: Only proceed if data has changed
+                    if (text === lastData) return;
+                    lastData = text;
+
+                    const rows = text.split("\n");
+                    const vals = rows[1].split(",");
+                    const data = {
+                        red: parseInt(vals[0]) || 0,
+                        green: parseInt(vals[1]) || 0,
+                        blue: parseInt(vals[2]) || 0,
+                    };
 
                     document.getElementById("count-red").innerText =
-                        redCount.toLocaleString();
-                    document.getElementById("count-mixed").innerText =
-                        mixedCount.toLocaleString();
+                        data.red.toLocaleString();
+                    document.getElementById("count-mix").innerText = (
+                        data.green + data.blue
+                    ).toLocaleString();
 
-                    const maxCount = Math.max(redCount, mixedCount);
-                    const jarElement = document.querySelector(".jar");
-                    const jarArea =
-                        (jarElement.clientWidth - 20) *
-                        (jarElement.clientHeight - 20);
-
-                    let ballArea = (jarArea / maxCount) * 0.78;
-                    let ballSize = Math.sqrt(ballArea);
-                    ballSize = Math.max(Math.min(ballSize, 60), 8);
-
-                    renderJar("jar-red", redCount, ["red"], ballSize);
-
-                    const mixedColors = [];
-                    for (let i = 0; i < greenCount; i++)
-                        mixedColors.push("green");
-                    for (let i = 0; i < blueCount; i++)
-                        mixedColors.push("blue");
-                    mixedColors.sort(() => Math.random() - 0.5);
-                    renderJar("jar-mixed", mixedCount, mixedColors, ballSize);
+                    render(data);
                 } catch (e) {
-                    console.error("Fetch error:", e);
+                    console.error("Update failed", e);
                 }
             }
 
-            function renderJar(jarId, count, colorArray, size) {
-                const jar = document.getElementById(jarId);
-                jar.innerHTML = "";
-                const fragment = document.createDocumentFragment();
-                const isMidsummer =
-                    document.body.classList.contains("midsummer-theme");
+            function render(data) {
+                const currentThemeKey =
+                    document.body.className.replace("-theme", "") || "standard";
+                const theme = themes[currentThemeKey];
+
+                const maxBalls = Math.max(data.red, data.green + data.blue);
+
+                // Draw Jars
+                drawToCanvas(
+                    "canvas-red",
+                    data.red,
+                    [theme.red],
+                    maxBalls,
+                    theme.shape,
+                );
+
+                const mixColors = Array(data.green)
+                    .fill(theme.green)
+                    .concat(Array(data.blue).fill(theme.blue));
+                drawToCanvas(
+                    "canvas-mix",
+                    mixColors.length,
+                    mixColors.sort(() => Math.random() - 0.5),
+                    maxBalls,
+                    theme.shape,
+                );
+            }
+
+            function drawToCanvas(id, count, colors, maxForScaling, shape) {
+                const canvas = document.getElementById(id);
+                const ctx = canvas.getContext("2d");
+
+                // Set internal resolution
+                canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+                canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+
+                const w = canvas.width;
+                const h = canvas.height;
+
+                // Dynamic Sizing
+                const area = w * h * 0.8;
+                const ballSize = Math.max(
+                    Math.min(Math.sqrt(area / maxForScaling), w / 5),
+                    10,
+                );
+
+                ctx.clearRect(0, 0, w, h);
+
+                let x = ballSize;
+                let y = h - ballSize;
 
                 for (let i = 0; i < count; i++) {
-                    const ball = document.createElement("div");
-                    const color =
-                        colorArray.length > 1 ? colorArray[i] : colorArray[0];
-                    ball.className = "ball " + color;
+                    ctx.fillStyle = colors[i % colors.length];
+                    ctx.beginPath();
 
-                    ball.style.width = size + "px";
-                    ball.style.height = size + "px";
+                    // Draw based on shape
+                    if (shape === "egg") {
+                        ctx.ellipse(
+                            x,
+                            y,
+                            ballSize / 2,
+                            ballSize / 1.5,
+                            0,
+                            0,
+                            Math.PI * 2,
+                        );
+                    } else if (shape === "leaf") {
+                        ctx.moveTo(x, y - ballSize / 2);
+                        ctx.quadraticCurveTo(
+                            x + ballSize / 2,
+                            y,
+                            x,
+                            y + ballSize / 2,
+                        );
+                        ctx.quadraticCurveTo(
+                            x - ballSize / 2,
+                            y,
+                            x,
+                            y - ballSize / 2,
+                        );
+                    } else {
+                        ctx.arc(x, y, ballSize / 2, 0, Math.PI * 2);
+                    }
 
-                    // Random rotation for leaves and strawberries
-                    const rotation = Math.floor(Math.random() * 360);
-                    ball.style.transform = `rotate(${rotation}deg)`;
+                    ctx.fill();
+                    ctx.strokeStyle = "rgba(0,0,0,0.1)";
+                    ctx.stroke();
 
-                    fragment.appendChild(ball);
+                    // Advanced wrapping logic
+                    x += ballSize + 2;
+                    if (x > w - ballSize) {
+                        x = ballSize;
+                        y -= ballSize + 2;
+                    }
                 }
-                jar.appendChild(fragment);
             }
 
-            window.addEventListener("resize", updateDisplay);
-            updateDisplay();
-            setInterval(updateDisplay, 30000);
+            setInterval(update, 10000); // Check every 10s
+            window.addEventListener("resize", () => {
+                lastData = "";
+                update();
+            });
+            update();
         </script>
     </body>
 </html>
